@@ -1,0 +1,286 @@
+﻿#pragma hdrstop
+#pragma argsused
+
+#ifdef _WIN32
+#include <tchar.h>
+#else
+typedef char _TCHAR;
+#define _tmain main
+#endif
+
+#include <stdlib.h>
+#include <stdio.h>
+#include <conio.h>
+#include <string.h>
+typedef struct
+{
+  char line[100];
+  char day[100];
+  char name[100];
+  int pairNum;
+  char pairType[100];
+  char teacherName[100];
+  void toString()
+  {
+    printf("\xBA%-15s\xBA%-15s\xBA%-15s\xBA%-15s\xBA%-15s\xBA%-15s\xBA\n", line, day, name, pairNum, pairType, teacherName);
+  }
+} Subject;
+void addByNum();
+void addElement();
+void defaultPrintMenu(const char *str_array[], int a);
+void printMenu(const char *str_array[], int var, int a);
+void ifEnter(int var);
+void print();
+void deleteByNum();
+void find();
+void razb(char *s, char *massl[]);
+int _tmain(int argc, _TCHAR *argv[])
+{
+  const char *str_array[] = {"Add element",
+                             "Add by number",
+                             "Print all",
+                             "Delete by number",
+                             "Delete file",
+                             "Copy to backup file",
+                             "Recovery from a backup file",
+                             "Find medicine with last date before 15.11.2020"};
+
+  int var = 0;
+  int a = 8;
+  defaultPrintMenu(str_array, a);
+  for (;;)
+  {
+    switch (getch())
+    {
+    case 72:
+      var--;
+      if (var == -1)
+      {
+        var = a - 1;
+      }
+      printMenu(str_array, var, a);
+
+      break;
+    case 80:
+      var++;
+      if (var == a)
+      {
+        var = 0;
+      }
+      printMenu(str_array, var, a);
+      break;
+    case 13:
+      ifEnter(var);
+      break;
+    case 75:
+      exit(-1);
+      break;
+    }
+  }
+
+  return 0;
+}
+void defaultPrintMenu(const char *str_array[], int a)
+{
+  printf("-->%s\n", str_array[0]);
+  for (int i = 1; i < a; i++)
+  {
+    printf("   %s\n", str_array[i]);
+  }
+}
+void printMenu(const char *str_array[], int var, int a)
+{
+  system("cls");
+  for (int i = 0; i < a; i++)
+  {
+    if (i == var)
+    {
+      printf("-->%s\n", str_array[i]);
+    }
+    else
+    {
+      printf("   %s\n", str_array[i]);
+    }
+  }
+  return;
+}
+void ifEnter(int var)
+{
+  switch (var)
+  {
+  case 0:
+    addElement();
+    break;
+  case 1:
+    addByNum();
+    break;
+  case 2:
+    print();
+    break;
+  case 3:
+    // deleteByNum();
+    break;
+  case 4:
+    // find();
+    break;
+  default:
+    break;
+  }
+}
+void addElement()
+{
+  FILE *f;
+  f = fopen("test.csv", "at");
+  Subject p;
+  puts("Over the line or under the line");
+  fflush(stdin);
+  scanf("%s", &p.line);
+  puts("Set day of week");
+  fflush(stdin);
+  scanf("%s", &p.day);
+  puts("Set name of subject");
+  fflush(stdin);
+  scanf("%s", &p.name);
+  puts("Set number of pair");
+  fflush(stdin);
+  scanf("%d", &p.pairNum);
+  puts("Set type of pair (lection or practice)");
+  fflush(stdin);
+  scanf("%s", &p.pairType);
+  puts("Set full name of teacher");
+  fflush(stdin);
+  scanf("%s", &p.teacherName);
+  fprintf(f, "%s;%s;%s;%d;%s;%s;\n", p.line, p.day, p.name, p.pairNum, p.pairType, p.teacherName);
+  fclose(f);
+  fflush(stdin);
+  return;
+}
+void addByNum()
+{
+  char **words = new char *[100];
+  for (int i = 0; i < 100; i++)
+  {
+    words[i] = new char[200];
+  }
+  char *temp = new char[100];
+
+  FILE *f1;
+  FILE *f2;
+  f1 = fopen("test.csv", "rt");
+  f2 = fopen("test1.csv", "at");
+  int i, m;
+  Subject p;
+  puts("Input number: ");
+  scanf("%d", &m);
+  for (int i = 0; i < m; i++)
+  {
+    fscanf(f1, "%s\n", temp);
+    razb(temp, words);
+    // printf("%s;%s;%s;%d;%s;%s\n", p.line, p.day, p.name, p.pairNum, p.pairType, p.teacherName);
+    fprintf(f2, "%s;%s;%s;%s;%s;%s;\n", words[0], words[1], words[2], words[3], words[4], words[5]);
+  }
+
+  puts("Over the line or under the line");
+  fflush(stdin);
+  scanf("%s", words[0]);
+  puts("Set day of week");
+  fflush(stdin);
+  scanf("%s", words[1]);
+  puts("Set name of subject");
+  fflush(stdin);
+  scanf("%s", words[2]);
+  puts("Set number of pair");
+  fflush(stdin);
+  scanf("%s", words[3]);
+  puts("Set type of pair (lection or practice)");
+  fflush(stdin);
+  scanf("%s", words[4]);
+  puts("Set full name of teacher");
+  fflush(stdin);
+  scanf("%s", words[5]);
+  fprintf(f2, "%s;%s;%s;%s;%s;%s;\n", words[0], words[1], words[2], words[3], words[4], words[5]);
+
+  while (fscanf(f1, "%s\n", temp) != EOF)
+  {
+    razb(temp, words);
+    fprintf(f2, "%s;%s;%s;%s;%s;%s;\n", words[0], words[1], words[2], words[3], words[4], words[5]);
+  }
+  fclose(f1);
+
+  fclose(f2);
+
+  if (remove("test.csv") != 0)
+  {
+    printf("delete error\n");
+  }
+
+  if (rename("test1.csv", "test.csv") != 0)
+  {
+    printf("rename error");
+  }
+}
+void razb(char *s, char *massl[])
+
+{
+
+  int k = 0;
+
+  char *t;
+
+  t = strtok(s, ";");
+
+  while (t != 0)
+  {
+
+    strcpy(massl[k], t);
+
+    k++;
+
+    t = strtok(NULL, ";");
+  }
+
+  return;
+}
+void print()
+{
+  char **words = new char *[100];
+  for (int i = 0; i < 100; i++)
+  {
+    words[i] = new char[200];
+  }
+  char *temp = new char[100];
+  FILE *f2;
+  f2 = fopen("test", "rt");
+  Subject p;
+  printf("\xC9");
+  for (int i = 0; i < 95; i++)
+  {
+    printf("\xCD");
+  }
+  printf("\xBB");
+  printf("\n");
+  printf("\xBA%-15s\xBA%-15s\xBA%-15s\xBA%-15s\xBA%-15s\xBA%-15s\xBA\n", "Line", "Day", "Subject", "Number of pair", "Type of pair", "Full name");
+  printf("\xCC");
+  for (int i = 0; i < 95; i++)
+  {
+    printf("\xCD");
+  }
+  printf("\xB9");
+  printf("\n");
+  while (fscanf(f2, "%s\n", temp) != EOF)
+  {
+    razb(temp, words);
+    printf("\xBA%-15s\xBA%-15s\xBA%-15s\xBA%-15s\xBA%-15s\xBA%-15s\xBA\n", words[0], words[1], words[2], words[3], words[4], words[5]);
+
+    printf("\xCC");
+    for (int i = 0; i < 79; i++)
+    {
+      printf("\xCD");
+    }
+
+    // printf("\xCC");
+    printf("\xB9");
+    printf("\n");
+  }
+    fclose(f2);
+}
